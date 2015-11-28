@@ -5,8 +5,8 @@
 ## Usage
 - setting.csvにドメイン名とIPアドレスをカンマ区切りで記入して下さい
 ```
-google.com, 127.0.0.1
-yahoo.co.jp, 8.8.8.8
+google.com, 1.2.3.4
+yahoo.co.jp, 9.8.7.6
 ```
 - Program.csをcsc等でビルドして下さい
 ```
@@ -22,7 +22,7 @@ Address:        127.0.0.1#53
 
 Non-authoritative answer:
 Name:   google.com
-Address: 127.0.0.1
+Address: 1.2.4.5
 
 nslookup yahoo.co.jp 127.0.0.1
 Server:         127.0.0.1
@@ -30,7 +30,7 @@ Address:        127.0.0.1#53
 
 Non-authoritative answer:
 Name:   yahoo.co.jp
-Address: 8.8.8.8
+Address: 9.8.7.6
 
 nslookup o8o.jp 127.0.0.1
 Server:         127.0.0.1
