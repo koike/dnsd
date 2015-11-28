@@ -14,7 +14,7 @@ namespace dnsd
         static void Main(string[] args)
         {
             var setting =
-                new StreamReader("setting.ini", Encoding.UTF8).ReadToEnd().Trim()
+                new StreamReader("setting.csv", Encoding.UTF8).ReadToEnd().Trim()
                     .Split('\n')
                     .Select(i => i.Trim().Split(',').ToList())
                     .ToList();
