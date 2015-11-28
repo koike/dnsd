@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Linq;
+using System.Threading;
 
 namespace dnsd
 {
@@ -135,6 +136,7 @@ namespace dnsd
                         var googleRes = google.Receive();
                         udp.Send(googleRes, googleRes.Length, remote.Address.ToString(), remote.Port);
                         Console.WriteLine($"Response.Data => {BitConverter.ToString(googleRes.ToArray()).Replace("-", " ")}");
+                        google.Close();
                         udp.Close();
                     }
                 }
