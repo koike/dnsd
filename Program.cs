@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Linq;
 
 namespace dnsd
 {
@@ -21,7 +20,6 @@ namespace dnsd
 
             var ip = "127.0.0.1";
             var port = 53;
-
             while (true)
             {
                 var local = IPAddress.Parse(ip);
@@ -121,64 +119,24 @@ namespace dnsd
                     if (count > 0)
                     {
                         foreach (var _ in from list in setting
-                            where list[0].Trim().Equals(domainName)
-                            select list[1].Trim().Split('.').Select(int.Parse).Select(BitConverter.GetBytes).ToArray())
+                                          where list[0].Trim().Equals(domainName)
+                                          select list[1].Trim().Split('.').Select(int.Parse).Select(BitConverter.GetBytes).ToArray())
                         {
                             res.AddRange(_.Select(b => b[0]));
                         }
+                        udp.Send(res.ToArray(), res.Count, remote.Address.ToString(), remote.Port);
+                        Console.WriteLine($"Response.Data => {BitConverter.ToString(res.ToArray()).Replace("-", " ")}");
+                        udp.Close();
                     }
                     else
                     {
-                        var psi = new ProcessStartInfo();
-                        psi.FileName = "nslookup";
-                        psi.Arguments = domainName + " 8.8.8.8";
-                        psi.RedirectStandardOutput = true;
-                        psi.WindowStyle = ProcessWindowStyle.Hidden;
-                        psi.UseShellExecute = false;
-                        var p = Process.Start(psi);
-                        p.WaitForExit();
-                        var output = p.StandardOutput.ReadToEnd().Split('\n');
-                        var rip = output.Where(i => i.Contains("Address")).ToList();
-                        var ips = "";
-                        if (rip.Count > 1)
-                        {
-                            if (rip[1].Contains("Address:"))
-                            {
-                                ips = rip[1].Replace("Address:", "").Trim();
-                                Console.WriteLine("=>" + ips);
-                            }
-                            else
-                            {
-                                ips = rip[1].Replace("Addresses:", "").Trim();
-                            }
-                            Console.WriteLine(ips);
-                            try
-                            {
-                                var _ = ips.Split('.').Select(int.Parse).Select(BitConverter.GetBytes).ToArray();
-                                res.AddRange(_.Select(b => b[0]));
-                            }
-                            catch (Exception)
-                            {
-                                //何らかのエラー
-                                //ipv6が降ってくるとダメっぽい
-                                res.Add(0x7F);
-                                res.Add(0x00);
-                                res.Add(0x00);
-                                res.Add(0x01);
-                            }
-                        }
-                        else
-                        {
-                            //正引き出来なかった場合
-                            res.Add(0x7F);
-                            res.Add(0x00);
-                            res.Add(0x00);
-                            res.Add(0x01);
-                        }
+                        var google = new UDP("8.8.8.8", 44444);
+                        google.Send(rcv);
+                        var googleRes = google.Receive();
+                        udp.Send(googleRes, googleRes.Length, remote.Address.ToString(), remote.Port);
+                        Console.WriteLine($"Response.Data => {BitConverter.ToString(googleRes.ToArray()).Replace("-", " ")}");
+                        udp.Close();
                     }
-                    Console.WriteLine($"Response.Data => {BitConverter.ToString(res.ToArray()).Replace("-", " ")}");
-                    udp.Send(res.ToArray(), res.Count, remote.Address.ToString(), remote.Port);
-                    udp.Close();
                 }
                 catch (Exception ex)
                 {
@@ -186,6 +144,32 @@ namespace dnsd
                     udp.Close();
                 }
             }
+        }
+    }
+
+    class UDP
+    {
+        private UdpClient udp;
+        public UDP(string hostname, int port)
+        {
+            udp = new UdpClient(port);
+            udp.Connect(hostname, 53);
+        }
+
+        public void Send(byte[] message)
+        {
+            udp.Send(message, message.Length);
+        }
+
+        public byte[] Receive()
+        {
+            var remote = new IPEndPoint(IPAddress.Any, 0);
+            return udp.Receive(ref remote);
+        }
+
+        public void Close()
+        {
+            udp.Close();
         }
     }
 }
