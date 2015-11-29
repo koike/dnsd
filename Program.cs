@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Linq;
-using System.Threading;
 
 namespace dnsd
 {
@@ -33,8 +32,28 @@ namespace dnsd
                     IPEndPoint remote = null;
                     var rcv = udp.Receive(ref remote);
 
-                    Console.WriteLine($"Address:{remote.Address}, Port:{remote.Port}");
-                    Console.WriteLine($"Received.Data => {BitConverter.ToString(rcv).Replace("-", " ")}");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("Address:");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine(remote.Address);
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("Port:");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine(remote.Port);
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("Received.Data:");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    var arr = BitConverter.ToString(rcv).Replace("-", " ").Split(' ');
+                    for (var i = 0; i < arr.Length; i++)
+                    {
+                        if (i%16 == 0)
+                        {
+                            Console.WriteLine();
+                        }
+                        Console.Write(arr[i] + " ");
+                    }
+                    Console.WriteLine();
+                    Console.ResetColor();
 
                     var res = new List<byte>();
                     var domainBytes = new List<byte>();
@@ -90,7 +109,11 @@ namespace dnsd
                     domainBytes.RemoveAt(0);
                     domainBytes.RemoveAt(domainBytes.Count - 1);
                     var domainName = Encoding.UTF8.GetString(domainBytes.ToArray());
-                    Console.WriteLine($"Domain => {domainName}");
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.Write("Domain:");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine(domainName);
+                    Console.ResetColor();
 
                     //Name: 固定値？
                     res.Add(0xc0);
@@ -126,7 +149,20 @@ namespace dnsd
                             res.AddRange(_.Select(b => b[0]));
                         }
                         udp.Send(res.ToArray(), res.Count, remote.Address.ToString(), remote.Port);
-                        Console.WriteLine($"Response.Data => {BitConverter.ToString(res.ToArray()).Replace("-", " ")}");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("My Response.Data:");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        arr = BitConverter.ToString(res.ToArray()).Replace("-", " ").Split(' ');
+                        for (var i = 0; i < arr.Length; i++)
+                        {
+                            if (i % 16 == 0)
+                            {
+                                Console.WriteLine();
+                            }
+                            Console.Write(arr[i] + " ");
+                        }
+                        Console.WriteLine();
+                        Console.ResetColor();
                         udp.Close();
                     }
                     else
@@ -135,16 +171,33 @@ namespace dnsd
                         google.Send(rcv);
                         var googleRes = google.Receive();
                         udp.Send(googleRes, googleRes.Length, remote.Address.ToString(), remote.Port);
-                        Console.WriteLine($"Response.Data => {BitConverter.ToString(googleRes.ToArray()).Replace("-", " ")}");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("Forward Response.Data:");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        arr = BitConverter.ToString(googleRes.ToArray()).Replace("-", " ").Split(' ');
+                        for (var i = 0; i < arr.Length; i++)
+                        {
+                            if (i%16 == 0)
+                            {
+                                Console.WriteLine();
+                            }
+                            Console.Write(arr[i] + " ");
+                        }
+                        Console.WriteLine();
+                        Console.ResetColor();
                         google.Close();
                         udp.Close();
                     }
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine(ex);
+                    Console.ResetColor();
                     udp.Close();
                 }
+
+                Console.WriteLine("\n");
             }
         }
     }

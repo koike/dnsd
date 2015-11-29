@@ -16,28 +16,40 @@ csc Program.cs
 - ビルドしたプログラムをsetting.csvのあるディレクトリで起動して下さい
 - 任意のドメインに関する正引きの返答が任意の値になります  
 それ以外の問い合わせには8.8.8.8の返答を返します
+<img src="http://o8o.jp/dnsd.png" width="40%">  
 ```
-nslookup google.com 127.0.0.1
-Server:         127.0.0.1
-Address:        127.0.0.1#53
+Address:127.0.0.1
+Port:56501
+Received.Data:
+E0 40 01 00 00 01 00 00 00 00 00 00 03 6F 38 6F
+02 6A 70 00 00 01 00 01
+Domain:o8o.jp
+Forward Response.Data:
+E0 40 81 80 00 01 00 01 00 00 00 00 03 6F 38 6F
+02 6A 70 00 00 01 00 01 C0 0C 00 01 00 01 00 00
+08 CD 00 04 85 82 34 BF
 
-Non-authoritative answer:
-Name:   google.com
-Address: 1.2.4.5
 
-nslookup yahoo.co.jp 127.0.0.1
-Server:         127.0.0.1
-Address:        127.0.0.1#53
+Address:127.0.0.1
+Port:56504
+Received.Data:
+1C 49 01 00 00 01 00 00 00 00 00 00 06 67 6F 6F
+67 6C 65 03 63 6F 6D 00 00 01 00 01
+Domain:google.com
+My Response.Data:
+1C 49 81 80 00 01 00 01 00 00 00 00 06 67 6F 6F
+67 6C 65 03 63 6F 6D 00 00 01 00 01 C0 0C 00 01
+00 01 00 01 51 80 00 04 01 02 04 05
 
-Non-authoritative answer:
-Name:   yahoo.co.jp
-Address: 9.8.7.6
 
-nslookup o8o.jp 127.0.0.1
-Server:         127.0.0.1
-Address:        127.0.0.1#53
-
-Non-authoritative answer:
-Name:   o8o.jp
-Address: 133.130.52.191
+Address:127.0.0.1
+Port:56507
+Received.Data:
+AB 4F 01 00 00 01 00 00 00 00 00 00 05 79 61 68
+6F 6F 02 63 6F 02 6A 70 00 00 01 00 01
+Domain:yahoo.co.jp
+My Response.Data:
+AB 4F 81 80 00 01 00 01 00 00 00 00 05 79 61 68
+6F 6F 02 63 6F 02 6A 70 00 00 01 00 01 C0 0C 00
+01 00 01 00 01 51 80 00 04 09 08 07 06
 ```
