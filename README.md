@@ -16,7 +16,7 @@ csc Program.cs
 - ビルドしたプログラムをsetting.csvのあるディレクトリで起動して下さい
 - 任意のドメインに関する正引きの返答が任意の値になります  
 それ以外の問い合わせには8.8.8.8の返答を返します  
-<img src="http://o8o.jp/dnsd.png" width="40%">  
+<img src="http://c.arckty.org/dnsd.png" width="40%">  
 ```
 Address:127.0.0.1
 Port:56501
